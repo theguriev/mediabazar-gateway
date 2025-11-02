@@ -1,0 +1,48 @@
+{
+  "/test": {
+    "methods": ["GET", "OPTIONS"],
+    "proxy": {
+      "to": "http://localhost:3000"
+    }
+  },
+  "/test-authorization": {
+    "methods": ["GET"],
+    "authorizationNeeded": true,
+    "proxy": {
+      "to": "http://localhost:3000"
+    }
+  },
+  "/test-headers": {
+    "methods": ["GET"],
+    "authorizationNeeded": true,
+    "proxy": {
+      "to": "http://localhost:3000/headers-test"
+    }
+  },
+  "/test-rate-limit": {
+    "methods": ["GET"],
+    "rateLimit": {
+      "requests": 3,
+      "window": 10
+    },
+    "proxy": {
+      "to": "http://localhost:3000"
+    }
+  },
+  "/test-rate-limit-strict": {
+    "methods": ["GET"],
+    "rateLimit": {
+      "requests": 1,
+      "window": 5
+    },
+    "proxy": {
+      "to": "http://localhost:3000"
+    }
+  },
+  "/test/:wallId/:id": {
+    "methods": ["GET"],
+    "proxy": {
+      "to": "http://localhost:3000/:wallId/:id"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+
+# Production builds
+dist/
+build/
+.output/
+.nitro/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependency directories
+node_modules/
