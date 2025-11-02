@@ -1,10 +1,10 @@
 import type { ProxyHeaders, UserPayload } from "../types/gateway";
 
-// Чистая функция для безопасного преобразования в строку
+// Pure function for safe string conversion
 const safeToString = (value: unknown): string =>
   value !== null && value !== undefined ? String(value) : "";
 
-// Чистая функция для обработки ролей
+// Pure function for roles processing
 const formatRoles = (roles?: string[] | string): string => {
   if (!roles) {
     return "";
@@ -12,7 +12,7 @@ const formatRoles = (roles?: string[] | string): string => {
   return Array.isArray(roles) ? roles.join(",") : safeToString(roles);
 };
 
-// Мапинг полей payload в заголовки
+// Payload fields to headers mapping
 const headerMappings = [
   { field: "id" as const, header: "X-User-Id" },
   { field: "email" as const, header: "X-User-Email" },
@@ -21,7 +21,7 @@ const headerMappings = [
   { field: "exp" as const, header: "X-Token-Expires" },
 ] as const;
 
-// Чистая функция для создания базовых заголовков
+// Pure function to create base headers
 const createBaseHeaders = (payload: UserPayload): ProxyHeaders =>
   headerMappings.reduce((headers, { field, header }) => {
     const value = payload[field];
@@ -31,7 +31,7 @@ const createBaseHeaders = (payload: UserPayload): ProxyHeaders =>
     return headers;
   }, {} as ProxyHeaders);
 
-// Чистая функция для добавления заголовка ролей
+// Pure function to add roles header
 const addRolesHeader = (
   headers: ProxyHeaders,
   roles?: string[] | string,
@@ -43,21 +43,21 @@ const addRolesHeader = (
   return headers;
 };
 
-// Основная функция для создания заголовков из payload
+// Main function to create headers from payload
 export const createProxyHeaders = (payload: UserPayload): ProxyHeaders => {
   const baseHeaders = createBaseHeaders(payload);
   return addRolesHeader(baseHeaders, payload.roles);
 };
 
-// Чистая функция для проверки наличия заголовков
+// Pure function to check if headers exist
 export const hasHeaders = (headers: ProxyHeaders): boolean =>
   Object.keys(headers).length > 0;
 
-// Функция высшего порядка для создания опций прокси
+// Higher-order function to create proxy options
 export const createProxyOptions = (headers: ProxyHeaders) =>
   hasHeaders(headers) ? { headers } : undefined;
 
-// Композиция функций для создания опций прокси из payload
+// Function composition to create proxy options from payload
 export const createProxyOptionsFromPayload = (payload?: UserPayload) => {
   if (!payload) {
     return undefined;
@@ -67,7 +67,7 @@ export const createProxyOptionsFromPayload = (payload?: UserPayload) => {
   return createProxyOptions(headers);
 };
 
-// Чистая функция для логирования заголовков (для отладки)
+// Pure function to get headers info (for debugging)
 export const getHeadersInfo = (headers: ProxyHeaders): string => {
   if (hasHeaders(headers)) {
     return `Proxy headers: ${Object.keys(headers).join(", ")}`;

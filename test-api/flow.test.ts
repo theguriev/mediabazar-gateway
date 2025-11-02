@@ -96,7 +96,7 @@ describe("Gateway", () => {
               "x-user-subject": "user-456",
             },
           });
-          // Проверяем, что время истечения токена тоже передается
+          // Check that token expiration time is also passed
           expect(response._data.headers["x-token-expires"]).toBeDefined();
         },
       });
@@ -107,7 +107,7 @@ describe("Gateway", () => {
       const userPayload = {
         id: 789,
         email: "admin@example.com",
-        roles: "admin", // строка вместо массива
+        roles: "admin", // string instead of array
         name: "Admin User",
       };
       const accessToken = await issueAccessToken(userPayload, { secret });
@@ -130,7 +130,7 @@ describe("Gateway", () => {
       const secret = String(process.env.NITRO_SECRET);
       const minimalPayload = {
         id: 999,
-        // нет email, name, roles, sub
+        // no email, name, roles, sub
       };
       const accessToken = await issueAccessToken(minimalPayload, { secret });
 
@@ -143,7 +143,7 @@ describe("Gateway", () => {
         onResponse: ({ response }) => {
           expect(response.status).toBe(200);
           expect(response._data.headers["x-user-id"]).toBe("999");
-          // Проверяем, что отсутствующие поля не добавляются в заголовки
+          // Check that missing fields are not added to headers
           expect(response._data.headers["x-user-email"]).toBeUndefined();
           expect(response._data.headers["x-user-name"]).toBeUndefined();
           expect(response._data.headers["x-user-roles"]).toBeUndefined();
@@ -156,7 +156,7 @@ describe("Gateway", () => {
     describe("GET /test-rate-limit", () => {
       it("allows requests within limit", async () => {
         const uniqueIP = "192.168.1.210";
-        // Делаем 3 запроса (лимит = 3 запроса за 10 секунд)
+        // Make 3 requests (limit = 3 requests per 10 seconds)
         for (let i = 0; i < 3; i++) {
           await $fetch("/test-rate-limit", {
             baseURL: "http://localhost:3000",
@@ -177,7 +177,7 @@ describe("Gateway", () => {
 
       it("blocks requests after exceeding limit", async () => {
         const uniqueIP = "192.168.1.220";
-        // Делаем 3 разрешенных запроса
+        // Make 3 allowed requests
         for (let i = 0; i < 3; i++) {
           await $fetch("/test-rate-limit", {
             baseURL: "http://localhost:3000",
@@ -189,7 +189,7 @@ describe("Gateway", () => {
           });
         }
 
-        // 4-й запрос должен быть заблокирован
+        // 4th request should be blocked
         await $fetch("/test-rate-limit", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -207,10 +207,10 @@ describe("Gateway", () => {
       });
 
       it("resets limit after window expires", async () => {
-        // Используем уникальный IP для этого теста
+        // Use unique IP for this test
         const uniqueIP = "192.168.1.200";
 
-        // Первый запрос должен пройти
+        // First request should pass
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -223,7 +223,7 @@ describe("Gateway", () => {
           },
         });
 
-        // Второй запрос сразу должен быть заблокирован
+        // Second request immediately should be blocked
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -236,10 +236,10 @@ describe("Gateway", () => {
           },
         });
 
-        // Ждем 6 секунд (больше чем window = 5 секунд)
+        // Wait 6 seconds (more than window = 5 seconds)
         await new Promise((resolve) => setTimeout(resolve, 6000));
 
-        // Теперь запрос должен пройти
+        // Now request should pass
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -254,15 +254,15 @@ describe("Gateway", () => {
             });
           },
         });
-      }, 10000); // увеличиваем timeout теста до 10 секунд
+      }, 10000); // increase test timeout to 10 seconds
 
       it("tracks different IPs separately", async () => {
-        // Этот тест сложнее реализовать в текущей среде,
-        // так как все запросы идут с одного IP.
-        // В реальной среде можно было бы использовать разные прокси
-        // или симулировать разные IP через заголовки X-Forwarded-For
+        // This test is harder to implement in the current environment,
+        // since all requests come from the same IP.
+        // In a real environment, different proxies could be used
+        // or different IPs simulated through X-Forwarded-For headers
 
-        // Для демонстрации покажем, что заголовок X-Forwarded-For учитывается
+        // For demonstration, show that X-Forwarded-For header is considered
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -275,7 +275,7 @@ describe("Gateway", () => {
           },
         });
 
-        // Второй запрос с тем же IP должен быть заблокирован
+        // Second request with the same IP should be blocked
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,
@@ -288,7 +288,7 @@ describe("Gateway", () => {
           },
         });
 
-        // Но запрос с другого IP должен пройти
+        // But request from different IP should pass
         await $fetch("/test-rate-limit-strict", {
           baseURL: "http://localhost:3000",
           ignoreResponseError: true,

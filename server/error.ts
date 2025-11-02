@@ -136,10 +136,15 @@ export default defineNitroErrorHandler((error, event) => {
     ]
       .filter(Boolean)
       .join(" ");
-    console.error(
-      tags,
-      error.message + "\n" + stack.map((l) => "  " + l.text).join("  \n"),
-    );
+
+    // Create error log message for debugging
+    const errorMessage = `${tags} ${error.message}\n${stack.map((l) => "  " + l.text).join("  \n")}`;
+
+    // In production, this could be sent to a logging service
+    if (process.env.NODE_ENV === "development") {
+      // biome-ignore lint/suspicious/noConsole: Development logging is acceptable
+      console.error(errorMessage);
+    }
   }
 
   setResponseStatus(event, statusCode, statusMessage);

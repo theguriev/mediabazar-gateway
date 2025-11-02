@@ -1,59 +1,59 @@
 import type { RateLimit, RateLimitEntry } from "../types/gateway";
 
-// Простой in-memory store для рейт лимитов
+// Simple in-memory store for rate limits
 const rateLimitStore = new Map<string, RateLimitEntry>();
 
-// Чистая функция для создания записи о лимите
+// Pure function to create a rate limit entry
 const createRateLimitEntry = (resetTime: number): RateLimitEntry => ({
   count: 1,
   resetTime,
 });
 
-// Чистая функция для проверки истечения времени
+// Pure function to check if entry is expired
 const isExpired = (entry: RateLimitEntry, now: number): boolean =>
   now > entry.resetTime;
 
-// Чистая функция для проверки превышения лимита
+// Pure function to check if limit is exceeded
 const isLimitExceeded = (entry: RateLimitEntry, limit: RateLimit): boolean =>
   entry.count >= limit.requests;
 
-// Чистая функция для создания ключа
+// Pure function to create rate limit key
 const createRateLimitKey = (ip: string): string => ip;
 
-// Чистая функция для инкремента счетчика
+// Pure function to increment counter
 const incrementCount = (entry: RateLimitEntry): RateLimitEntry => ({
   ...entry,
   count: entry.count + 1,
 });
 
-// Чистая функция для вычисления времени сброса
+// Pure function to calculate reset time
 const calculateResetTime = (now: number, windowSeconds: number): number =>
   now + windowSeconds * 1000;
 
-// Основная функция проверки рейт лимита (использует side effects только для store)
+// Main rate limit check function (uses side effects only for store)
 export const checkRateLimit = (ip: string, limit: RateLimit): boolean => {
   const now = Date.now();
   const key = createRateLimitKey(ip);
   const current = rateLimitStore.get(key);
 
-  // Если записи нет или время истекло - создаем новую
+  // If no record exists or time expired - create new entry
   if (!current || isExpired(current, now)) {
     const resetTime = calculateResetTime(now, limit.window);
     rateLimitStore.set(key, createRateLimitEntry(resetTime));
     return true;
   }
 
-  // Если лимит превышен - отклоняем
+  // If limit exceeded - reject
   if (isLimitExceeded(current, limit)) {
     return false;
   }
 
-  // Инкрементируем счетчик
+  // Increment counter
   rateLimitStore.set(key, incrementCount(current));
   return true;
 };
 
-// Чистая функция для очистки истекших записей
+// Pure function to cleanup expired entries
 export const cleanupExpiredEntries = (): void => {
   const now = Date.now();
   for (const [key, entry] of rateLimitStore.entries()) {
@@ -63,7 +63,7 @@ export const cleanupExpiredEntries = (): void => {
   }
 };
 
-// Функция для получения статистики (для отладки)
+// Function to get statistics (for debugging)
 export const getRateLimitStats = () => ({
   totalEntries: rateLimitStore.size,
   entries: Array.from(rateLimitStore.entries()).map(([key, entry]) => ({

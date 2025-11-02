@@ -2,7 +2,7 @@ import type { H3Event } from "h3";
 import type { UserPayload } from "../types/gateway";
 import { createProxyOptionsFromPayload } from "./headers";
 
-// Чистая функция для подготовки URL с параметрами
+// Pure function to prepare URL with parameters
 export const prepareProxyTarget = (
   target: string,
   params: Record<string, string>,
@@ -15,21 +15,21 @@ export const prepareProxyTarget = (
   return `${targetWithParams}${search}`;
 };
 
-// Чистая функция для получения client IP
+// Pure function to get client IP
 const getClientIP = (event: H3Event): string => {
   const forwardedFor = getHeader(event, "x-forwarded-for");
   const requestIP = getRequestIP(event);
   return forwardedFor || requestIP || "unknown";
 };
 
-// Типы для конфигурации прокси
+// Types for proxy configuration
 interface ProxyConfig {
   to?: string;
 }
 
 type ProxyTarget = string | ProxyConfig;
 
-// Чистая функция для извлечения URL из конфигурации прокси
+// Pure function to extract URL from proxy configuration
 const extractProxyUrl = (proxy: ProxyTarget): string | null => {
   if (typeof proxy === "string") {
     return proxy;
@@ -40,7 +40,7 @@ const extractProxyUrl = (proxy: ProxyTarget): string | null => {
   return null;
 };
 
-// Главная функция для обработки proxy запроса
+// Main function to handle proxy requests
 export const handleProxyRequest = (
   event: H3Event,
   proxy: ProxyTarget,
@@ -63,12 +63,12 @@ export const handleProxyRequest = (
   return proxyRequest(event, target, proxyOptions);
 };
 
-// Функция высшего порядка для создания proxy middleware
+// Higher-order function to create proxy middleware
 export const createProxyMiddleware =
   (proxy: ProxyTarget) => (event: H3Event, userPayload?: UserPayload) =>
     handleProxyRequest(event, proxy, userPayload);
 
-// Чистая функция для валидации proxy конфигурации
+// Pure function to validate proxy configuration
 export const isValidProxyConfig = (proxy: unknown): proxy is ProxyTarget => {
   if (typeof proxy === "string") {
     return proxy.length > 0;
@@ -79,5 +79,5 @@ export const isValidProxyConfig = (proxy: unknown): proxy is ProxyTarget => {
   return false;
 };
 
-// Функция для получения IP клиента (для rate limiting)
+// Function to get client IP (for rate limiting)
 export const extractClientIP = getClientIP;

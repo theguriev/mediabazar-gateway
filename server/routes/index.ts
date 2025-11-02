@@ -1,5 +1,5 @@
 export default eventHandler(() => {
   return {
-    success: true
-  }
-})
+    success: true,
+  };
+});

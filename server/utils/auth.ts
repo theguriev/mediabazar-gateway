@@ -1,30 +1,30 @@
 import type { H3Event } from "h3";
 import type { UserPayload } from "../types/gateway";
 
-// Типы для результатов авторизации
+// Types for authorization results
 export interface AuthResult {
   success: boolean;
   payload?: UserPayload;
   error?: string;
 }
 
-// Чистая функция для извлечения токена из куки
+// Pure function to extract token from cookie
 const extractAccessToken = (event: H3Event): string | undefined =>
   getCookie(event, "accessToken");
 
-// Чистая функция для создания успешного результата
+// Pure function to create success result
 const createSuccessResult = (payload: UserPayload): AuthResult => ({
   success: true,
   payload,
 });
 
-// Чистая функция для создания результата с ошибкой
+// Pure function to create error result
 const createErrorResult = (error: string): AuthResult => ({
   success: false,
   error,
 });
 
-// Чистая функция для валидации токена
+// Pure function for token validation
 const validateToken = async (
   token: string,
   secret: string,
@@ -36,7 +36,7 @@ const validateToken = async (
   }
 };
 
-// Основная функция авторизации
+// Main authorization function
 export const authorize = async (
   event: H3Event,
   secret: string,
@@ -57,7 +57,7 @@ export const authorize = async (
   }
 };
 
-// Функция высшего порядка для создания middleware авторизации
+// Higher-order function to create auth middleware
 export const createAuthMiddleware =
   (secret: string) =>
   async (event: H3Event): Promise<UserPayload> => {
@@ -73,6 +73,6 @@ export const createAuthMiddleware =
     return result.payload!;
   };
 
-// Чистая функция для проверки необходимости авторизации
+// Pure function to check if authorization is required
 export const isAuthRequired = (authorizationNeeded?: boolean): boolean =>
   Boolean(authorizationNeeded);

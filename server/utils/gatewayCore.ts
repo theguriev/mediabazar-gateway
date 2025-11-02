@@ -9,14 +9,14 @@ import {
 } from "./proxy";
 import { checkRateLimit } from "./rateLimit";
 
-// Чистая функция для валидации метода
+// Pure function to validate method
 const isValidMethod = (method: string, app: NitroApp): method is RouterMethod =>
   method in app.router;
 
-// Чистая функция для создания обработчика маршрута
+// Pure function to create route handler
 const createRouteHandler = (route: Route, secret: string) =>
   defineEventHandler(async (event: H3Event) => {
-    // Проверка рейт лимита
+    // Rate limit check
     if (route.rateLimit) {
       const clientIP = extractClientIP(event);
       if (!checkRateLimit(clientIP, route.rateLimit)) {
@@ -28,7 +28,7 @@ const createRouteHandler = (route: Route, secret: string) =>
       }
     }
 
-    // Авторизация
+    // Authorization
     let userPayload: UserPayload | undefined;
 
     if (isAuthRequired(route.authorizationNeeded)) {
@@ -42,7 +42,7 @@ const createRouteHandler = (route: Route, secret: string) =>
       userPayload = authResult.payload;
     }
 
-    // Proxy обработка
+    // Proxy handling
     if (route.proxy && isValidProxyConfig(route.proxy)) {
       return handleProxyRequest(event, route.proxy, userPayload);
     }
@@ -50,7 +50,7 @@ const createRouteHandler = (route: Route, secret: string) =>
     return new Response("No proxy defined", { status: 500 });
   });
 
-// Функция для регистрации одного маршрута
+// Function to register a single route
 const registerRoute = (
   app: NitroApp,
   path: string,
@@ -71,7 +71,7 @@ const registerRoute = (
   });
 };
 
-// Функция для регистрации всех маршрутов
+// Function to register all routes
 export const registerRoutes = (
   app: NitroApp,
   routes: RoutesConfig,
@@ -82,7 +82,7 @@ export const registerRoutes = (
   });
 };
 
-// Чистая функция для загрузки конфигурации маршрутов
+// Pure function to load routes configuration
 export const loadRoutesConfig = (filePath: string): RoutesConfig => {
   try {
     const file = readFileSync(filePath, "utf-8");
@@ -95,14 +95,14 @@ export const loadRoutesConfig = (filePath: string): RoutesConfig => {
   }
 };
 
-// Главная функция инициализации gateway
+// Main gateway initialization function
 export const initializeGateway = (app: NitroApp): void => {
   try {
     const { routesFile, secret } = useRuntimeConfig();
     const routes = loadRoutesConfig(routesFile);
     registerRoutes(app, routes, secret);
   } catch (error) {
-    // Gateway initialization failed - это критическая ошибка
+    // Gateway initialization failed - this is a critical error
     throw new Error(
       `Gateway initialization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
     );

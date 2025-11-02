@@ -3,7 +3,7 @@ import type { NitroRouteConfig } from "nitropack";
 
 export interface RateLimit {
   requests: number;
-  window: number; // в секундах
+  window: number; // in seconds
 }
 
 export interface Route extends NitroRouteConfig {
