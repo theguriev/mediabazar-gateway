@@ -24,7 +24,7 @@ describe("Gateway", () => {
         onResponse: ({ response }) => {
           expect(response.status).toBe(404);
           expect(response._data).toMatchObject({
-            message: "Access token not found!",
+            message: "Access token not found",
           });
         },
       });
@@ -41,7 +41,7 @@ describe("Gateway", () => {
         onResponse: ({ response }) => {
           expect(response.status).toBe(401);
           expect(response._data).toMatchObject({
-            message: "Invalid access token!",
+            message: "Invalid access token",
           });
         },
       });
@@ -57,7 +57,6 @@ describe("Gateway", () => {
           Cookie: `accessToken=${accessToken};`,
         },
         onResponse: ({ response }) => {
-          console.log("log: 🚀", response, secret);
           expect(response.status).toBe(200);
           expect(response._data).toMatchObject({
             success: true,
